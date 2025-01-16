@@ -1,2 +1,13 @@
-# MusicalMinecraft
+# Musical Minecraft in SuperCollider, powered by OpenAI's OpenAPI.
 I created a state machine that takes in symbols that describe the current gameplay and output background music for the game Minecraft in real-time as you play through it.
+
+## How It Works
+A Python program periodically takes screenshots of Minecraft once you open game. This Python program sends those screenshots to a GPT-4o mini model (using OpenAI API), which would then describe that screenshot using a list of predefined symbols (\home, \forest, \snow, \desert, etc.) as recognized by SuperCollider. This symbol is written into a text document. A program in SuperCollider reads this text document and use the symbol as input for a state machine. Each state (or combination of states) results in a different soundscape, which is dictated by a series of instruments, with the pitches and durations generated using randomness (within a defined range)
+
+## The Process
+The Python program to screenshot and prompt OpenAI for a response is actually pretty simple. There are many libraries that take care of these functionalities for you, so the script isn’t too complex. What was complex was running it from SuperCollider. I didn’t like the idea of having to run two separate programs, so I had SuperCollider call the Python script from its code. This took a lot of finagling and random troubleshooting that is not really important to detail here, but it was difficult (something to do with PATHs, permissions, etc.). In the end, though, I was able to obtain Python functionality from within SuperCollider (through Bash)! I was able to call this Python program from a SuperCollider loop every 15 seconds to continually monitor a player’s environment.
+
+I had trouble at first with the music making process. I didn’t know how to loop Pdefs elegantly from a state machine, especially in an efficient way. To streamline the music making process, I had a function that generated 8 note sequences for four different Pdefs depending on instrument, allowed octaves, defined mode/scale, amplitude, and other variables. These Pdefs played for the duration of runtime, and would be muted or turned up depending on if they were needed. The state machine itself would change all of the variables for each of the four Pdefs to achieve a desired sound. To create a continuous stream of music, I simply reused the same four Pdefs, and these Pdefs simply became new instruments as the program needed. A loop would check every 2 seconds to see if these Pdefs have stopped playing, generate new notes for them, and start playing them again.
+
+## Reflection
+While Minecraft is a fun and succint use case example for this program, this program has the potential to be reactive any type of visual input. If this program were to be embedded into a helmet camera, for example, a person could have reactive music to a series of real life environments.
